@@ -12,13 +12,10 @@ import {
   User, 
   Search, 
   ArrowRight, 
-  Copy, 
-  Check, 
   Stethoscope, 
   RefreshCw, 
   Building2, 
   ChevronDown, 
-  Gift, 
   Truck, 
   Bot, 
   Loader2, 
@@ -46,11 +43,7 @@ const CONCIERGE_FAQS = [
   },
   {
     q: "Can someone who is not a patient of your clinic use Re-Up?",
-    a: "Yes. Select 'Outside / Referred Patient' on the intake form. Our clinical staff handles the prescription authentication directly with your prescribing office."
-  },
-  {
-    q: "How does the $25 referral program work?",
-    a: "When you share your personal VIP link with a friend, they receive $25 applied directly to their first Re-Up supply. In turn, a $25 optical credit is logged to your patient chart for future supplies."
+    a: "Yes. Select 'Outside Referral' on the intake form. Our clinical staff handles the prescription authentication directly with your prescribing office."
   },
   {
     q: "How quickly do my lenses arrive?",
@@ -93,8 +86,6 @@ export default function App() {
     contactType: 'phone',
     contactValue: '',
     patientStatus: 'existing',
-    hasReferralCode: false,
-    referralCodeInput: '',
   });
 
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -102,43 +93,7 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const referralCode = 'REUP-25VIP';
-  const [copiedLink, setCopiedLink] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
-
-  // AI Concierge Chat state
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    {
-      role: 'assistant',
-      text: "Hello! I'm your Re-Up Clinical Assistant. You can ask me anything about your lens parameters (BC, DIA, Power), brand modalities, or how our chart lookup works. How can I help?"
-    }
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const chatBottomRef = useRef(null);
-
-  useEffect(() => {
-    if (chatOpen && chatBottomRef.current) {
-      chatBottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages, chatOpen]);
-
-  const handleCopyReferral = () => {
-    const textToCopy = `https://reupcontacts.com/vip?gift=25&ref=${encodeURIComponent(referralCode)}`;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(textToCopy);
-    } else {
-      const textArea = document.createElement('textarea');
-      textArea.value = textToCopy;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2400);
-  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -163,7 +118,6 @@ export default function App() {
           contactMethod: formData.contactType === 'phone' ? 'Phone / SMS' : 'Email',
           contactInfo: formData.contactValue,
           patientCategory: formData.patientStatus === 'existing' ? 'Current Patient' : 'Outside Referral',
-          referralCode: formData.referralCodeInput || 'None',
           submissionTimestamp: new Date().toLocaleString(),
         }),
       });
@@ -179,7 +133,6 @@ export default function App() {
         contact: formData.contactValue,
         channel: formData.contactType === 'phone' ? 'Direct SMS' : 'Encrypted Email',
         lens: 'Confirmed via Text',
-        creditApplied: formData.referralCodeInput ? '$25 Friend Credit Applied' : 'Standard Concierge Dispatch'
       });
       setFormSubmitted(true);
     } catch (err) {
@@ -198,8 +151,6 @@ export default function App() {
       contactType: 'phone',
       contactValue: '',
       patientStatus: 'existing',
-      hasReferralCode: false,
-      referralCodeInput: '',
     });
   };
 
@@ -212,7 +163,6 @@ export default function App() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f025_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f025_1px,transparent_1px)] bg-[size:3rem_3rem]" />
       </div>
 
-      {}
       <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -227,23 +177,6 @@ export default function App() {
                 Concierge
               </span>
             </div>
-          </div>
-
-          <div className="flex items-center space-x-3 text-xs font-semibold">
-            <a 
-              href="#share" 
-              className="text-slate-600 hover:text-blue-600 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              <Gift className="w-3.5 h-3.5 text-blue-600" />
-              <span>Give $25</span>
-            </a>
-            <button 
-              onClick={() => setChatOpen(true)}
-              className="inline-flex items-center gap-1.5 text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/70 px-3 py-1.5 rounded-lg transition-all"
-            >
-              <Bot className="w-3.5 h-3.5 text-blue-600" />
-              <span>Questions?</span>
-            </button>
           </div>
         </div>
       </header>
@@ -305,12 +238,6 @@ export default function App() {
                     <span className="text-slate-400 font-sans">Turnaround:</span>
                     <span className="font-sans font-bold text-slate-900">Fast, Tracked Doorstep Dispatch</span>
                   </div>
-                  {submissionReceipt?.creditApplied.includes('$25') && (
-                    <div className="flex justify-between text-indigo-700 pt-1 border-t border-slate-200 font-sans font-bold">
-                      <span>Perk:</span>
-                      <span>$25 Friend Credit Applied</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="p-3.5 bg-blue-50 border border-blue-200/80 rounded-xl text-xs text-blue-900 text-left flex items-start gap-2.5">
@@ -439,37 +366,6 @@ export default function App() {
                   />
                 </div>
 
-                {/* Referral Code (Clean Expandable) */}
-                <div className="pt-1">
-                  {!formData.hasReferralCode ? (
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, hasReferralCode: true })}
-                      className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-semibold"
-                    >
-                      <Gift className="w-3.5 h-3.5" />
-                      <span>Have a $25 friend referral code?</span>
-                    </button>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Enter referral code"
-                        value={formData.referralCodeInput}
-                        onChange={(e) => setFormData({ ...formData, referralCodeInput: e.target.value.toUpperCase() })}
-                        className="w-full bg-indigo-50/50 border border-indigo-200 rounded-xl px-3 py-2 text-xs text-indigo-950 uppercase font-mono font-bold focus:outline-none focus:border-indigo-400"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, hasReferralCode: false, referralCodeInput: '' })}
-                        className="text-xs text-slate-400 hover:text-slate-600 px-2"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
-                </div>
-
                 {submitError && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 text-center font-medium">
                     {submitError}
@@ -541,40 +437,7 @@ export default function App() {
           </div>
         </section>
 
-        {}
-        <section id="share" className="mb-14 max-w-2xl mx-auto">
-          <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 sm:p-8 shadow-lg shadow-blue-600/15 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="text-left space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-bold uppercase tracking-wider">
-                <Gift className="w-3 h-3" />
-                <span>Give $25 &bull; Get $25</span>
-              </div>
-              <h3 className="text-lg font-bold">Pass the Re-Up to Friends</h3>
-              <p className="text-xs text-blue-100 max-w-sm leading-relaxed">
-                Friends get $25 off their first order, and a $25 credit is added to your clinic chart.
-              </p>
-            </div>
-
-            <button
-              onClick={handleCopyReferral}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
-            >
-              {copiedLink ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Link Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Copy Invite Link</span>
-                </>
-              )}
-            </button>
-          </div>
-        </section>
-
-        {}
+        {/* Common Questions */}
         <section className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Common Questions</h3>
@@ -606,90 +469,6 @@ export default function App() {
 
       </main>
 
-      {}
-      {chatOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl flex flex-col h-[80vh] sm:h-[520px] overflow-hidden">
-            
-            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center">
-                  <Bot className="w-3.5 h-3.5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-xs text-slate-900">Re-Up Clinical Assistant</h4>
-                  <span className="text-[10px] text-slate-400">Available 24/7</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setChatOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fcfdfe] text-xs">
-              {chatMessages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white rounded-br-none'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-xs'
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
-              {chatLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-3 py-2 flex items-center space-x-2 text-slate-400 text-xs">
-                    <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
-                    <span>Checking clinical guide...</span>
-                  </div>
-                </div>
-              )}
-              <div ref={chatBottomRef} />
-            </div>
-
-            <form onSubmit={handleSendMessage} className="p-2.5 bg-white border-t border-slate-200 flex gap-2">
-              <input
-                type="text"
-                placeholder="Ask about parameters, delivery, or brands..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
-              />
-              <button
-                type="submit"
-                disabled={chatLoading || !chatInput.trim()}
-                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs"
-              >
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Discreet Floating Chat Trigger */}
-      <div className="fixed bottom-5 right-5 z-40">
-        <button
-          onClick={() => setChatOpen(true)}
-          className="px-3.5 py-2.5 rounded-full bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs shadow-lg flex items-center gap-2 transition-all hover:scale-105"
-        >
-          <Bot className="w-3.5 h-3.5 text-blue-400" />
-          <span>Ask Assistant</span>
-        </button>
-      </div>
-
-      {}
-      {}
       <footer className="border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-400">
         <p className="font-bold text-slate-700 mb-1">RE-UP CONTACT LENSES</p>
         <p className="max-w-md mx-auto leading-relaxed">
