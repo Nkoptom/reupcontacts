@@ -47,7 +47,7 @@ const CONCIERGE_FAQS = [
   },
   {
     q: "How quickly do my lenses arrive?",
-    a: "Once our optical staff verifies your parameters and texts you to confirm your address, factory-sealed boxes are dispatched directly to your door with fast, tracked shipping."
+    a: "Once our optical staff verifies your parameters and texts you to confirm your address, factory-sealed boxes are shipped directly to your door with fast, tracked shipping."
   }
 ];
 
@@ -200,7 +200,7 @@ export default function App() {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl mx-auto">
-            Cross-referenced directly with your electronic health record. No logins, accounts, or optical pickup lines—just authentic factory lenses delivered straight to your door with fast, tracked dispatch.
+            Cross-referenced directly with your electronic health record. No logins, accounts, or optical pickup lines—just authentic factory lenses delivered straight to your door with fast, tracked shipping.
           </p>
         </section>
 
@@ -236,14 +236,14 @@ export default function App() {
                   </div>
                   <div className="flex justify-between text-slate-700">
                     <span className="text-slate-400 font-sans">Turnaround:</span>
-                    <span className="font-sans font-bold text-slate-900">Fast, Tracked Doorstep Dispatch</span>
+                    <span className="font-sans font-bold text-slate-900">Fast, Tracked Doorstep Shipping</span>
                   </div>
                 </div>
 
                 <div className="p-3.5 bg-blue-50 border border-blue-200/80 rounded-xl text-xs text-blue-900 text-left flex items-start gap-2.5">
                   <Clock className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <span>
-                    Our dispensary is cross-referencing your chart. Expect a text message shortly to verify your delivery address before dispatch.
+                    Our dispensary is cross-referencing your chart. Expect a text message shortly to verify your delivery address before shipping.
                   </span>
                 </div>
 
@@ -430,8 +430,8 @@ export default function App() {
                 3
               </span>
               <div>
-                <h4 className="text-xs font-bold text-slate-900">Doorstep Dispatch</h4>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">Manufacturer-sealed boxes dispatched rapidly straight to your door.</p>
+                <h4 className="text-xs font-bold text-slate-900">Doorstep Shipping</h4>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">Manufacturer-sealed boxes shipped rapidly straight to your door.</p>
               </div>
             </div>
           </div>
