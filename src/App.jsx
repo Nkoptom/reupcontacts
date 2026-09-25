@@ -475,7 +475,7 @@ export default function App() {
           Optical dispensary concierge. Verified directly with in-house patient records. Authentic manufacturer packaging with fast, tracked doorstep delivery.
         </p>
         <p className="mt-3 text-[11px] text-slate-300">
-          Practice Text Line: (555) 738-7698 &bull; &copy; {new Date().getFullYear()} Re-Up Contacts
+          &copy; {new Date().getFullYear()} Re-Up Contacts
         </p>
       </footer>
 
