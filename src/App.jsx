@@ -43,7 +43,7 @@ const CONCIERGE_FAQS = [
   },
   {
     q: "Can someone who is not a patient of your clinic use Re-Up?",
-    a: "Yes. Select 'Outside Referral' on the intake form. Our clinical staff handles the prescription authentication directly with your prescribing office."
+    a: "Yes. Select 'New to Re-Up' on the intake form. Our clinical staff handles the prescription authentication directly with your prescribing office."
   },
   {
     q: "How quickly do my lenses arrive?",
@@ -117,7 +117,7 @@ export default function App() {
           dateOfBirth: formData.dob,
           contactMethod: formData.contactType === 'phone' ? 'Phone / SMS' : 'Email',
           contactInfo: formData.contactValue,
-          patientCategory: formData.patientStatus === 'existing' ? 'Current Patient' : 'Outside Referral',
+          patientCategory: formData.patientStatus === 'existing' ? 'Current Patient' : 'New to Re-Up',
           submissionTimestamp: new Date().toLocaleString(),
         }),
       });
@@ -275,15 +275,15 @@ export default function App() {
 
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, patientStatus: 'outside' })}
+                    onClick={() => setFormData({ ...formData, patientStatus: 'New to Re-Up' })}
                     className={`py-2.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                      formData.patientStatus === 'outside'
+                      formData.patientStatus === 'New to Re-Up'
                         ? 'bg-white text-blue-700 shadow-xs'
                         : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >
                     <Stethoscope className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Outside Referral</span>
+                    <span>New to Re-Up</span>
                   </button>
                 </div>
 
