@@ -47,7 +47,7 @@ const CONCIERGE_FAQS = [
   },
   {
     q: "How quickly do my lenses arrive?",
-    a: "Once our optical staff verifies your parameters and texts you to confirm your address, factory-sealed boxes are shipped directly to your door with fast, tracked shipping."
+    a: "Once our optical staff verifies your parameters and texts you to confirm your address, factory-sealed boxes are shipped directly to your door with fast shipping."
   }
 ];
 
@@ -200,7 +200,7 @@ export default function App() {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl mx-auto">
-            Cross-referenced directly with your electronic health record. No logins, accounts, or optical pickup lines—just authentic factory lenses delivered straight to your door with fast, tracked shipping.
+            Cross-referenced directly with your electronic health record. No logins, accounts, or optical pickup lines—just authentic factory lenses delivered straight to your door with fast shipping.
           </p>
         </section>
 
@@ -236,7 +236,7 @@ export default function App() {
                   </div>
                   <div className="flex justify-between text-slate-700">
                     <span className="text-slate-400 font-sans">Turnaround:</span>
-                    <span className="font-sans font-bold text-slate-900">Fast, Tracked Doorstep Shipping</span>
+                    <span className="font-sans font-bold text-slate-900">Fast Doorstep Shipping</span>
                   </div>
                 </div>
 
@@ -393,7 +393,7 @@ export default function App() {
 
                 <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 pt-1">
                   <Lock className="w-3 h-3 text-blue-600" />
-                  <span>Confidential chart matching &bull; Fast, tracked doorstep delivery</span>
+                  <span>Confidential chart matching &bull; Fast doorstep delivery</span>
                 </div>
 
               </form>
@@ -431,7 +431,7 @@ export default function App() {
               </span>
               <div>
                 <h4 className="text-xs font-bold text-slate-900">Doorstep Shipping</h4>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">Manufacturer-sealed boxes shipped rapidly straight to your door.</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">Manufacturer-sealed boxes shipped straight to your door.</p>
               </div>
             </div>
           </div>
@@ -472,7 +472,7 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-400">
         <p className="font-bold text-slate-700 mb-1">RE-UP CONTACT LENSES</p>
         <p className="max-w-md mx-auto leading-relaxed">
-          Optical dispensary concierge. Verified directly with in-house patient records. Authentic manufacturer packaging with fast, tracked doorstep delivery.
+          Optical dispensary concierge. Verified directly with in-house patient records. Authentic manufacturer packaging with fast doorstep delivery.
         </p>
         <p className="mt-3 text-[11px] text-slate-300">
           &copy; {new Date().getFullYear()} Re-Up Contacts
