@@ -1,40 +1,9 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { 
-  Eye, 
-  ShieldCheck, 
-  Sparkles, 
-  Send, 
-  Calendar, 
-  CheckCircle2, 
-  Lock, 
-  Phone, 
-  Mail, 
-  User, 
-  Search, 
-  ArrowRight, 
-  Stethoscope, 
-  RefreshCw, 
-  Building2, 
-  ChevronDown, 
-  Truck, 
-  Bot, 
-  Loader2, 
-  X,
-  Clock
-} from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Sparkles, Lock, ChevronDown, Eye } from 'lucide-react';
 
-const POPULAR_LENSES = [
-  { id: 'dt1', name: 'Dailies Total 1', brand: 'Alcon' },
-  { id: 'oasys-1day', name: 'Acuvue Oasys 1-Day HydraLuxe', brand: 'Johnson & Johnson' },
-  { id: 'p1', name: 'Precision1', brand: 'Alcon' },
-  { id: 'oasys-2wk', name: 'Acuvue Oasys', brand: 'Johnson & Johnson' },
-  { id: 'biofinity', name: 'Biofinity / Toric', brand: 'CooperVision' },
-  { id: 'infuse', name: 'Bausch + Lomb INFUSE', brand: 'Bausch + Lomb' },
-  { id: 'myday', name: 'MyDay', brand: 'CooperVision' },
-  { id: 'clariti', name: 'clariti 1 day', brand: 'CooperVision' },
-  { id: 'ultra', name: 'Bausch + Lomb ULTRA', brand: 'Bausch + Lomb' },
-  { id: 'air-optix', name: 'Air Optix HydraGlyde', brand: 'Alcon' }
-];
+// HIPAA-compliant Jotform form (submissions go to hipaa-submit.jotform.com)
+const JOTFORM_ID = '262985603964067';
+const JOTFORM_URL = `https://form.jotform.com/${JOTFORM_ID}`;
 
 const CONCIERGE_FAQS = [
   {
@@ -51,108 +20,27 @@ const CONCIERGE_FAQS = [
   }
 ];
 
-async function callGemini(payload, retries = 3, delay = 1000) {
-  const apiKey = "";
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        if (response.status === 429 && i < retries - 1) {
-          await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-          continue;
-        }
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
-    }
-  }
-}
-
 export default function App() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    dob: '',
-    contactType: 'phone',
-    contactValue: '',
-    patientStatus: 'existing',
-  });
-
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [submissionReceipt, setSubmissionReceipt] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-
   const [activeFaq, setActiveFaq] = useState(null);
+  const [formHeight, setFormHeight] = useState(560);
+  const iframeRef = useRef(null);
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.fullName || !formData.dob || !formData.contactValue) return;
-
-    setIsSubmitting(true);
-    setSubmitError('');
-
-    const mockTicket = 'RU-' + Math.floor(100000 + Math.random() * 900000);
-
-    try {
-      const response = await fetch('https://formspree.io/f/xaenjlqq', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          ticketNumber: mockTicket,
-          patientName: formData.fullName,
-          dateOfBirth: formData.dob,
-          contactMethod: formData.contactType === 'phone' ? 'Phone / SMS' : 'Email',
-          contactInfo: formData.contactValue,
-          patientCategory: formData.patientStatus === 'existing' ? 'Current Patient' : 'New to Re-Up',
-          submissionTimestamp: new Date().toLocaleString(),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Formspree delivery issue');
+  // Jotform posts its content height so the embedded form can resize without scrollbars.
+  useEffect(() => {
+    const onMessage = (e) => {
+      if (!/^https:\/\/([a-z0-9-]+\.)*jotform\.com$/.test(e.origin)) return;
+      if (typeof e.data !== 'string') return;
+      const parts = e.data.split(':');
+      if (parts[0] === 'setHeight' && parts[2] === JOTFORM_ID) {
+        const h = parseInt(parts[1], 10);
+        if (h > 0 && h < 5000) setFormHeight(h);
+      } else if (parts[0] === 'scrollIntoView' && iframeRef.current) {
+        iframeRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-
-      setSubmissionReceipt({
-        id: mockTicket,
-        name: formData.fullName,
-        status: formData.patientStatus,
-        contact: formData.contactValue,
-        channel: formData.contactType === 'phone' ? 'Direct SMS' : 'Encrypted Email',
-        lens: 'Confirmed via Text',
-      });
-      setFormSubmitted(true);
-    } catch (err) {
-      setSubmitError('Unable to send request right now. Please check your connection or try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const resetForm = () => {
-    setFormSubmitted(false);
-    setSubmitError('');
-    setFormData({
-      fullName: '',
-      dob: '',
-      contactType: 'phone',
-      contactValue: '',
-      patientStatus: 'existing',
-    });
-  };
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
@@ -166,7 +54,7 @@ export default function App() {
       <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
               <Eye className="w-4 h-4" />
             </div>
             <div>
@@ -206,198 +94,23 @@ export default function App() {
 
         {/* Form Card Section */}
         <section className="max-w-xl mx-auto mb-16">
-          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xl shadow-slate-200/50 relative">
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-2 sm:p-4 shadow-xl shadow-slate-200/50 relative">
             
-            {formSubmitted ? (
-              <div className="text-center py-4 space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md shadow-blue-500/20">
-                  <CheckCircle2 className="w-7 h-7" />
-                </div>
+            <iframe
+              ref={iframeRef}
+              id={`JotFormIFrame-${JOTFORM_ID}`}
+              title="Re-Up Lens Request"
+              src={JOTFORM_URL}
+              style={{ width: '100%', height: `${formHeight}px`, border: 'none' }}
+              scrolling="no"
+              allow="geolocation 'none'; camera 'none'; microphone 'none'"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
 
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900">Concierge Request Received</h3>
-                  <p className="text-xs text-slate-600 mt-1">
-                    Ticket <span className="font-mono font-bold text-blue-700">{submissionReceipt?.id}</span> is now active with our dispensary.
-                  </p>
-                </div>
-
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left text-xs space-y-2.5 font-mono">
-                  <div className="flex justify-between text-slate-700">
-                    <span className="text-slate-400 font-sans">Patient:</span>
-                    <span className="font-bold">{submissionReceipt?.name}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-700">
-                    <span className="text-slate-400 font-sans">Verification Via:</span>
-                    <span>{submissionReceipt?.channel} ({submissionReceipt?.contact})</span>
-                  </div>
-                  <div className="flex justify-between text-slate-700">
-                    <span className="text-slate-400 font-sans">Lens Profile:</span>
-                    <span className="truncate max-w-[200px]">{submissionReceipt?.lens}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-700">
-                    <span className="text-slate-400 font-sans">Turnaround:</span>
-                    <span className="font-sans font-bold text-slate-900">Fast Doorstep Shipping</span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 bg-blue-50 border border-blue-200/80 rounded-xl text-xs text-blue-900 text-left flex items-start gap-2.5">
-                  <Clock className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span>
-                    Our dispensary is cross-referencing your chart. Expect a text message shortly to verify your delivery address before shipping.
-                  </span>
-                </div>
-
-                <button
-                  onClick={resetForm}
-                  className="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1.5 transition-colors pt-2"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Submit Another Request</span>
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleFormSubmit} className="space-y-5">
-                
-                {/* Patient Category Toggle */}
-                <div className="p-1 rounded-xl bg-slate-100 border border-slate-200 grid grid-cols-2 gap-1 text-xs font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, patientStatus: 'existing' })}
-                    className={`py-2.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                      formData.patientStatus === 'existing'
-                        ? 'bg-white text-blue-700 shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    <Building2 className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Current Patient</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, patientStatus: 'New to Re-Up' })}
-                    className={`py-2.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                      formData.patientStatus === 'New to Re-Up'
-                        ? 'bg-white text-blue-700 shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    <Stethoscope className="w-3.5 h-3.5 text-blue-600" />
-                    <span>New to Re-Up</span>
-                  </button>
-                </div>
-
-                {/* Name & DOB (The EHR Lookup Pair) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-                      <User className="w-3 h-3 text-blue-600" />
-                      <span>Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Alex Morgan"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-blue-600" />
-                        <span>Date of Birth</span>
-                      </span>
-                      <span className="text-[10px] text-slate-400">(Chart Key)</span>
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      value={formData.dob}
-                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Contact Method */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-                      {formData.contactType === 'phone' ? (
-                        <Phone className="w-3 h-3 text-blue-600" />
-                      ) : (
-                        <Mail className="w-3 h-3 text-blue-600" />
-                      )}
-                      <span>Phone number</span>
-                    </label>
-
-                    <div className="flex rounded-md bg-slate-100 p-0.5 text-[11px] font-semibold">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, contactType: 'phone' })}
-                        className={`px-2 py-0.5 rounded transition-all ${
-                          formData.contactType === 'phone' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-500'
-                        }`}
-                      >
-                        SMS
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, contactType: 'email' })}
-                        className={`px-2 py-0.5 rounded transition-all ${
-                          formData.contactType === 'email' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-500'
-                        }`}
-                      >
-                        Email
-                      </button>
-                    </div>
-                  </div>
-
-                  <input
-                    type={formData.contactType === 'phone' ? 'tel' : 'email'}
-                    required
-                    placeholder={formData.contactType === 'phone' ? '(555) 000-0000' : 'alex@example.com'}
-                    value={formData.contactValue}
-                    onChange={(e) => setFormData({ ...formData, contactValue: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all font-mono"
-                  />
-                </div>
-
-                {submitError && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 text-center font-medium">
-                    {submitError}
-                  </div>
-                )}
-
-                {/* Submit CTA */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white shadow-md shadow-blue-600/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Connecting to Dispensary...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      <span>Verify &amp; Re-Up Lenses</span>
-                    </>
-                  )}
-                </button>
-
-                <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 pt-1">
-                  <Lock className="w-3 h-3 text-blue-600" />
-                  <span>Confidential chart matching &bull; Fast doorstep delivery</span>
-                </div>
-
-              </form>
-            )}
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 pt-3">
+              <Lock className="w-3 h-3 text-blue-600" />
+              <span>Encrypted, HIPAA-compliant submission &bull; Fast doorstep delivery</span>
+            </div>
 
           </div>
         </section>
