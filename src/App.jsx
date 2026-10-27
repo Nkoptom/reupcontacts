@@ -12,7 +12,7 @@ const CONCIERGE_FAQS = [
   },
   {
     q: "Can someone who is not a patient of your clinic use Re-Up?",
-    a: "Yes. Select 'New to Re-Up' on the intake form. Our clinical staff handles the prescription authentication directly with your prescribing office."
+    a: "Yes. Select 'New to Re-Up' on the intake form. Our clinical staff handles the prescription authentication directly."
   },
   {
     q: "How quickly do my lenses arrive?",
