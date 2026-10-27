@@ -53,7 +53,7 @@ export default function App() {
 
       <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <a href="/" aria-label="RE-UP home: start a new lens request" title="Start a new request" className="flex items-center space-x-3 rounded-lg hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
               <Eye className="w-4 h-4" />
             </div>
@@ -65,7 +65,7 @@ export default function App() {
                 Concierge
               </span>
             </div>
-          </div>
+          </a>
         </div>
       </header>
 
