@@ -45,10 +45,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
       
-      {/* Discreet Atmospheric Glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-[15%] left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-blue-100/60 blur-[130px] rounded-full" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f025_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f025_1px,transparent_1px)] bg-[size:3rem_3rem]" />
+      {/* Water background: a fixed layer (not background-attachment: fixed, which iOS Safari ignores) */}
+      <div aria-hidden="true" className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute inset-0 bg-[url('/bg-water.jpg')] bg-cover bg-[center_top]" />
+        {/* Light wash so text and cards stay easy to read over the water */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-white/35 to-white/55" />
       </div>
 
       <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
@@ -153,7 +154,7 @@ export default function App() {
         {/* Common Questions */}
         <section className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Common Questions</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">Common Questions</h3>
           </div>
 
           <div className="space-y-2.5">
@@ -182,7 +183,7 @@ export default function App() {
 
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-400">
+      <footer className="relative z-10 border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-400">
         <p className="font-bold text-slate-700 mb-1">RE-UP CONTACT LENSES</p>
         <p className="max-w-md mx-auto leading-relaxed">
           Optical dispensary concierge. Verified directly with in-house patient records. Authentic manufacturer packaging with fast doorstep delivery.
