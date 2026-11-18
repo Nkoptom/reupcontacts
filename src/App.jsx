@@ -24,6 +24,20 @@ export default function App() {
   const [activeFaq, setActiveFaq] = useState(null);
   const [formHeight, setFormHeight] = useState(560);
   const iframeRef = useRef(null);
+  const heroLogoRef = useRef(null);
+  const [showHeaderLogo, setShowHeaderLogo] = useState(false);
+
+  // Show the small header logo only once the big logo at the top has scrolled out of view.
+  useEffect(() => {
+    const el = heroLogoRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') { setShowHeaderLogo(true); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowHeaderLogo(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+      { rootMargin: '-64px 0px 0px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Jotform posts its content height so the embedded form can resize without scrollbars.
   useEffect(() => {
@@ -43,7 +57,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-blue-100 selection:text-blue-900 overflow-x-clip">
       
       {/* Water background: a fixed layer (not background-attachment: fixed, which iOS Safari ignores) */}
       <div aria-hidden="true" className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -52,9 +66,9 @@ export default function App() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-white/35 to-white/55" />
       </div>
 
-      <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
+      <header className={`sticky top-0 z-30 border-b transition-colors duration-300 ${showHeaderLogo ? 'border-slate-200/80 bg-white/90 backdrop-blur-md' : 'border-transparent bg-transparent'}`}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <a href="/" aria-label="RE-UP home: start a new lens request" title="Start a new request" className="flex items-center space-x-3 rounded-lg hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+          <a href="/" aria-label="RE-UP home: start a new lens request" title="Start a new request" aria-hidden={!showHeaderLogo} tabIndex={showHeaderLogo ? 0 : -1} className={`flex items-center space-x-3 rounded-lg transition-all duration-300 ${showHeaderLogo ? 'opacity-100 translate-y-0 hover:opacity-80' : 'opacity-0 -translate-y-1 pointer-events-none'} focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}>
             <img src="/reup-logo.png" alt="re-up" width="544" height="207" className="h-10 w-auto" />
             <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60 hidden sm:inline">
               Concierge
@@ -69,17 +83,16 @@ export default function App() {
         {}
         {/* Main Content Area */}
         <section className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-800 text-xs font-semibold uppercase tracking-wider mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Dedicated Contact Lens Concierge</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 mb-4 leading-tight">
-            Never get caught dry. <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-sky-600 to-indigo-600">
-              Your contact lens concierge.
-            </span>
+          <h1 className="font-brand text-[#3e6497]">
+            <img ref={heroLogoRef} src="/reup-logo.png" alt="re-up" width="544" height="207" className="mx-auto h-20 sm:h-28 w-auto" />
+            <span className="block mt-4 text-xl sm:text-3xl font-medium tracking-[0.1em] sm:tracking-[0.16em]">never get caught dry.</span>
           </h1>
+          <svg aria-hidden="true" viewBox="0 0 240 12" className="mx-auto mt-1 w-40 sm:w-52 h-3 text-[#3e6497]">
+            <path d="M4 8 C 60 2, 170 1, 236 6" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          </svg>
+          <p className="font-brand mt-4 mb-6 text-sm sm:text-base font-medium tracking-[0.16em] sm:tracking-[0.22em] text-[#3e6497]/90">
+            your contact lens concierge
+          </p>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl mx-auto">
             Cross-referenced directly with your electronic health record. No logins, accounts, or optical pickup lines—just authentic factory lenses delivered straight to your door with fast shipping.
@@ -95,6 +108,7 @@ export default function App() {
               id={`JotFormIFrame-${JOTFORM_ID}`}
               title="Re-Up Lens Request"
               src={JOTFORM_URL}
+              className="scroll-mt-24"
               style={{ width: '100%', height: `${formHeight}px`, border: 'none' }}
               scrolling="no"
               allow="geolocation 'none'; camera 'none'; microphone 'none'"
