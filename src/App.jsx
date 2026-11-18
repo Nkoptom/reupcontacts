@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Lock, ChevronDown, Eye } from 'lucide-react';
+import { Sparkles, Lock, ChevronDown } from 'lucide-react';
 
 // HIPAA-compliant Jotform form (submissions go to hipaa-submit.jotform.com)
 const JOTFORM_ID = '262985603964067';
@@ -55,17 +55,10 @@ export default function App() {
       <header className="relative z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <a href="/" aria-label="RE-UP home: start a new lens request" title="Start a new request" className="flex items-center space-x-3 rounded-lg hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
-              <Eye className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-black text-lg tracking-tight text-slate-900 font-mono">
-                RE<span className="text-blue-600">-</span>UP
-              </span>
-              <span className="ml-2 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60 hidden sm:inline">
-                Concierge
-              </span>
-            </div>
+            <img src="/reup-logo.png" alt="re-up" width="544" height="207" className="h-10 w-auto" />
+            <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60 hidden sm:inline">
+              Concierge
+            </span>
           </a>
         </div>
       </header>
